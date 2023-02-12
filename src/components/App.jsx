@@ -12,29 +12,21 @@ export class App extends Component {
     search: '',
     images: [],
     isLoading: false,
-    error: null,
-
-    // total_pages: 1,
     isOpen: false,
     activeImage: null,
   };
 
-  handleChangeSearch = search => {
-    this.setState({ search, page: 1, images: [] });
-    console.log(search);
+  handleSubmitForm = search => {
+    this.setState({ search, page: 1 });
   };
 
-  handleOpenModal = ({ largeImageURL }) => {
+  handleOpenModal = largeImageURL => {
     this.setState({ isOpen: true, activeImage: largeImageURL });
   };
 
   handleCloseModal = () => {
     this.setState({ isOpen: false });
   };
-
-  // handleToggleModal = () => {
-  //   this.setState(prevState => ({ IsOpen: !prevState.IsOpen }));
-  // };
 
   componentDidMount() {
     const { search, page } = this.state;
@@ -43,8 +35,6 @@ export class App extends Component {
       .then(res => {
         this.setState({
           images: res.data.hits,
-          // total_pages: Math.ceil(res.data.totalHits / 12),
-          // search: this.state.search,
         });
       })
       .catch(error => {
@@ -53,46 +43,45 @@ export class App extends Component {
       .finally(() => {
         this.setState({ isLoading: false });
       });
-    console.log(this.state.isOpen);
+    
   }
 
   componentDidUpdate(_, prevState) {
-    // if (prevState.page !== this.state.page) {
-    //   this.setState({ isLoading: true });
-    //   fetchApi(this.state.search, this.state.page)
-    //     .then(res => {
-    //       this.setState(prevState => {
-    //         return {
-    //           images: [...prevState.images, ...res.data.hits],
-    //         };
-    //       });
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //     })
-    //     .finally(() => {
-    //       this.setState({ isLoading: false });
-    //     });
-    // }
-    console.log(this.state.isOpen);
+    if (prevState.page !== this.state.page) {
+      this.setState({ isLoading: true });
+      fetchApi(this.state.search, this.state.page)
+        .then(res => {
+          this.setState(prevState => {
+            return {
+              images: [...prevState.images, ...res.data.hits],
+            };
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
+    }
+    if (prevState.search !== this.state.search) {
+      this.setState({ isLoading: true });
+      fetchApi(this.state.search, this.state.page)
+        .then(res => {
+          this.setState(prevState => {
+            return {
+              images: [...res.data.hits],
+            };
+          });
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
+    }
   }
-
-  //  async fetchImage(){
-  //  try {
-  //   this.setState({ isLoading: true });
-  //   const { search, page } = this.state;
-  //   const res = await fetchApi(search, page);
-  //  (prevState => ({
-  //   images: [...prevState.images, ...res.data.hits],
-  //   total_pages: res.data.total_pages,
-  // }))
-
-  //  } catch (error) {
-  //   this.setState({ error: error.message })
-  //   }finally{
-  //     this.setState({ isLoading: false })
-
-  // }}
 
   handleLoadMore = e => {
     this.setState(prevState => {
@@ -101,17 +90,15 @@ export class App extends Component {
   };
 
   render() {
-    // const isShowButton = this. state.images.length > 0 && !isLoading;
-    // const { images, isLoading, IsOpen, activeImage } = this.state;
     return (
       <>
-        <Searchbar onSubmit={this.handleChangeSearch} />
+        <Searchbar onSubmit={this.handleSubmitForm} />
         {this.state.isLoading && <Loader />}
         <ImageGallery
           images={this.state.images}
           onOpenModal={this.handleOpenModal}
         />
-        {/* {isShowButton ? <Button onClick={this.handleLoadMore}/> : null} */}
+
         {this.state.images.length > 0 && (
           <Button onClick={this.handleLoadMore}>Load More</Button>
         )}

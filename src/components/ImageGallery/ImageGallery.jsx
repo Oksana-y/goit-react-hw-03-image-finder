@@ -10,7 +10,7 @@ const ImageGallery = ({ images, onOpenModal }) => {
   return (
     <ul className={css.gallery}>
       {images.map(image => (
-        <ImageGalleryItem key={image.id} image={image} onClick={onOpenModal} />
+        <ImageGalleryItem key={nanoid()} image={image} onClick={onOpenModal} />
       ))}
     </ul>
   );
