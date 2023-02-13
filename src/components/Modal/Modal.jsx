@@ -1,7 +1,5 @@
 import { Component } from 'react';
 import css from './modal.module.scss';
-import PropTypes from 'prop-types';
-
 
 class Modal extends Component {
   handleEscapeClose = e => {
