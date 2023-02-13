@@ -14,10 +14,12 @@ export class App extends Component {
     isLoading: false,
     isOpen: false,
     activeImage: null,
+    limit: 12,
+
   };
 
   handleSubmitForm = search => {
-    this.setState({ search, page: 1 });
+    this.setState({ search, page: 1, images: [] });
   };
 
   handleOpenModal = largeImageURL => {
@@ -29,9 +31,9 @@ export class App extends Component {
   };
 
   componentDidMount() {
-    const { search, page } = this.state;
+    const { search, page, limit } = this.state;
     this.setState({ isLoading: true });
-    fetchApi(search, page)
+    fetchApi(search, page, limit)
       .then(res => {
         this.setState({
           images: res.data.hits,
@@ -47,9 +49,9 @@ export class App extends Component {
   }
 
   componentDidUpdate(_, prevState) {
-    if (prevState.page !== this.state.page) {
+    if (prevState.page !== this.state.page || prevState.search !== this.state.search) {
       this.setState({ isLoading: true });
-      fetchApi(this.state.search, this.state.page)
+      fetchApi(this.state.search, this.state.page, this.state.limit)
         .then(res => {
           this.setState(prevState => {
             return {
@@ -64,23 +66,7 @@ export class App extends Component {
           this.setState({ isLoading: false });
         });
     }
-    if (prevState.search !== this.state.search) {
-      this.setState({ isLoading: true });
-      fetchApi(this.state.search, this.state.page)
-        .then(res => {
-          this.setState(prevState => {
-            return {
-              images: [...res.data.hits],
-            };
-          });
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.setState({ isLoading: false });
-        });
-    }
+   
   }
 
   handleLoadMore = e => {
